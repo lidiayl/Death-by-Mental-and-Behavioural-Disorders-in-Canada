@@ -83,7 +83,7 @@
             .attr('y', d => yScale(yValue(d)))
             .attr('width', 30)
             .attr('height',d => innerHeight - yScale(yValue(d)))
-            .attr('fill','#4d88ff')
+            .attr('fill','steelblue')
           .on("mouseover", function(d,i) {
             d3.select(this)
               .attr('fill','maroon');
@@ -101,7 +101,7 @@
             d3.select(this)
               .transition()
               .duration(250)
-              .attr('fill','#4d88ff');
+              .attr('fill','steelblue');
             tooltip.style('opacity', 0) 
           })
     }
