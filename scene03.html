@@ -10,7 +10,8 @@
 <body>
   <h1>Death by Mental and Behavioural Disorders in Canada</h1>
   <br>
-  <a href="scene02.html"><img src="next.png" alt="next" style="width:50px;height:25px;"></a>
+  <a href="scene02.html"><img src="back.png" alt="back" style="width:50px;height:25px;"></a>
+  <a href="index.html"><img src="home.png" alt="next" style="width:50px;height:25px;"></a>
   <br>
 <svg width='960' height='500'></svg>
 <div id="tooltip"></div>
@@ -28,20 +29,20 @@
           .delay(100);
 
     const render = data => {
-        const xValue = d => d.Year;
-        const yValue = d => d.Total;
+        const yValue = d => d.COD;
+        const xValue = d => d.Total;
         const margin = {top:50, right:50, bottom:50, left:100};
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
-        const xScale = d3.scaleBand()
-            .domain(data.map(xValue))
-            .range([0,innerWidth])
+        const yScale = d3.scaleBand()
+            .domain(data.map(yValue))
+            .range([0,innerHeight])
             .padding(0,3);
         
-        const yScale = d3.scaleLinear()
-            .domain([d3.max(data,yValue),0])
-            .range([0,innerHeight]);
+        const xScale = d3.scaleLinear()
+            .domain([d3.max(data,xValue),0])
+            .range([0,innerWidth]);
 
         const g = svg.append('g')
           .attr('transform',`translate(${margin.left},${margin.top})`);
@@ -54,9 +55,9 @@
             .attr('y',450)
             .attr('fill', 'darkblue')
             .attr('font-family','sans-serif')
-            .text('Year');
+            .text('Deaths');
 
-        const yAxisTickFormat = number => 
+        const xAxisTickFormat = number => 
           format('.2s')(number);
 
         const yAxis = g.append('g')
@@ -66,16 +67,15 @@
               .attr('y', -20)
               .attr('fill','darkblue')
               .attr('font-family','sans-serif')
-              .text('Deaths')
+              .text('Cause of Death')
 
-        g.selectAll('rect')
+        g.selectAll('circle')
           .data(data)
           .enter()
-          .append('rect')
-            .attr('x', d => xScale(xValue(d)))
-            .attr('y', d => yScale(yValue(d)))
-            .attr('width', 30)
-            .attr('height',d => innerHeight - yScale(yValue(d)))
+          .append('circle')
+            .attr('cx', d => xScale(xValue(d)))
+            .attr('cy', d => yScale(yValue(d)))
+            .attr('r',  d => xValue(d)/2000)
             .attr('fill','steelblue')
           .on("mouseover", function(d,i) {
             d3.select(this)
@@ -83,7 +83,7 @@
             tooltip.style('opacity', 1)
               .style('left',(d.pageX)+'px')
               .style('top',(d.pageY)+'px')
-              .html("<p><span class='toolTip'>" + "Year: " + xValue(i) + "</span><br>" + "Deaths: " +numberFormat(yValue(i)) + "</p>")
+              .html("<p><span class='toolTip'>" + "COD: " + yValue(i) + "</span><br>" + "Deaths: " +numberFormat(xValue(i)) + "</p>")
           })
           .on('mousemove', function(d) {
             tooltip
@@ -114,14 +114,14 @@
     .delay(1000)
     .text(function(d, i) { 
       switch (i) {
-        case 0: return ('- over 200,000 people in Canada died every year due to mental and behaviour disorder')
-        case 1: return ('- the average increase rate is 1.41% per year')
+        case 0: return ('- the highest deaths occured in seniors over 70 years old')
+        case 1: return ('- young people tend to be more resistant and to be able survive')
       }
     });
           
     } 
 
-    d3.csv('scene01_data.csv').then(data => {
+    d3.csv('scene03_data.csv').then(data => {
         data.forEach(d=> {
             d.Total=+d.Total;
         });

@@ -1,0 +1,54 @@
+Group,COD,Total,Female,Male
+[F01],Vascular dementia,21922,13076,8846
+[F03],Unspecified dementia,221027,145988,75039
+[F04],"Organic amnesic syndrome, not induced by alcohol and other psychoactive substances",137,31,106
+[F05],"Delirium, not induced by alcohol and other psychoactive substances",3563,1682,1881
+[F06],Other mental disorders due to brain damage and dysfunction and to physical disease,1682,1097,585
+[F07],"Personality and behavioural disorders due to brain disease, damage and dysfunction",122,58,64
+[F09],Unspecified organic or symptomatic mental disorder,30,18,12
+[F10],Mental and behavioural disorders due to use of alcohol,15085,3409,11676
+[F11],Mental and behavioural disorders due to use of opioids,170,73,97
+[F12],Mental and behavioural disorders due to use of cannabinoids,15,3,12
+[F13],Mental and behavioural disorders due to use of sedatives or hypnotics,13,7,6
+[F14],Mental and behavioural disorders due to use of cocaine,373,96,277
+[F15],"Mental and behavioural disorders due to use of other stimulants, including caffeine",45,10,35
+[F17],Mental and behavioural disorders due to use of tobacco,589,228,361
+[F18],Mental and behavioural disorders due to use of volatile solvents,12,8,4
+[F19],Mental and behavioural disorders due to multiple drug use and use of other psychoactive substances,1920,786,1134
+[F20],Schizophrenia,1790,1022,768
+[F21],Schizotypal disorder,1,0,1
+[F22],Persistent delusional disorders,135,95,40
+[F23],Acute and transient psychotic disorders,6,3,3
+[F25],Schizoaffective disorders,149,94,55
+[F29],Unspecified nonorganic psychosis,85,58,27
+[F30],Manic episode,3,2,1
+[F31],Bipolar affective disorder,479,317,162
+[F32],Depressive episodes,1873,1249,624
+[F33],Recurrent depressive disorder,149,108,41
+[F34],Persistent mood [affective] disorders,13,12,1
+[F38],Other mood [affective] disorders,1,0,1
+[F39],Unspecified mood [affective] disorder,10,8,2
+[F40],Phobic anxiety disorders,4,2,2
+[F41],Other anxiety disorders,86,62,24
+[F42],Obsessive-compulsive disorder,11,6,5
+[F43],"Reaction to severe stress, and adjustment disorders",59,19,40
+[F44],Dissociative [conversion] disorders,12,8,4
+[F45],Somatoform disorders,7,7,0
+[F48],Other neurotic disorders,6,6,0
+[F50],Eating disorders,362,298,64
+[F54],Psychological and behavioural factors associated with disorders or diseases classified elsewhere,14,8,6
+[F55],Abuse of non-dependence-producing substances,43,17,26
+[F60],Specific personality disorders,28,18,10
+[F68],Other disorders of adult personality and behaviour,1,0,1
+[F69],Unspecified disorder of adult personality and behaviour,38,25,13
+[F70],Mild mental retardation,2,2,0
+[F71],Moderate mental retardation,3,1,2
+[F72],Severe mental retardation,134,66,68
+[F73],Profound mental retardation,94,44,50
+[F79],Unspecified mental retardation,664,322,342
+[F82],Specific developmental disorder of motor function,2,1,1
+[F83],Mixed specific developmental disorders,1,0,1
+[F84],Pervasive developmental disorders,127,88,39
+[F89],Unspecified disorder of psychological development,48,25,23
+[F91],Conduct disorders,1,0,1
+[F99],Unspecified mental disorder,17,8,9
