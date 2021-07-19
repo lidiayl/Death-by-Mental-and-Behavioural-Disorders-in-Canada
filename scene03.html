@@ -6,9 +6,10 @@
 </head>
 
 <script src='https://d3js.org/d3.v6.min.js'></script>
+<script src="https://unpkg.com/d3@5.6.0/dist/d3.min.js"></script>
 
 <body>
-  <h1>Death by Mental and Behavioural Disorders in Canada</h1>
+  <h1>Death by Mental and Behavioural Disorders in Canada 2000-2019</h1>
   <br>
   <a href="scene02.html"><img src="back.png" alt="back" style="width:50px;height:25px;"></a>
   <a href="index.html"><img src="home.png" alt="next" style="width:50px;height:25px;"></a>
@@ -16,117 +17,314 @@
 <svg width='960' height='500'></svg>
 <div id="tooltip"></div>
 <div id="myAnnotation"></div>
+<div id = "menus">
+  <span id="y-menu"></span>
+  <span id="x-menu"></span>
+</div>
+
 <script>
-    const svg = d3.select('svg');
-    const width = 960;
-    const height = 500;
 
-    const numberFormat = d3.format(',.0f');
-
-    var tooltip = d3.select('#tooltip');
-    var myAnnotation = d3.select('#myAnnotation')
-          .transition()
-          .delay(100);
-
-    const render = data => {
-        const yValue = d => d.COD;
-        const xValue = d => d.Total;
-        const margin = {top:50, right:50, bottom:50, left:100};
-        const innerWidth = width - margin.left - margin.right;
-        const innerHeight = height - margin.top - margin.bottom;
-
-        const yScale = d3.scaleBand()
-            .domain(data.map(yValue))
-            .range([0,innerHeight])
-            .padding(0,3);
-        
-        const xScale = d3.scaleLinear()
-            .domain([d3.max(data,xValue),0])
-            .range([0,innerWidth]);
-
-        const g = svg.append('g')
-          .attr('transform',`translate(${margin.left},${margin.top})`);
-
-        const xAxis = g.append('g')
-          .call(d3.axisBottom(xScale))
-          .attr('transform',`translate(0,${innerHeight})`)
-          g.append('text')
-            .attr('x', innerWidth/2)
-            .attr('y',450)
-            .attr('fill', 'darkblue')
-            .attr('font-family','sans-serif')
-            .text('Deaths');
-
-        const xAxisTickFormat = number => 
-          format('.2s')(number);
-
-        const yAxis = g.append('g')
-            .call(d3.axisLeft(yScale))
-            g.append('text')
-              .attr('x',-50)
-              .attr('y', -20)
-              .attr('fill','darkblue')
-              .attr('font-family','sans-serif')
-              .text('Cause of Death')
-
-        g.selectAll('circle')
-          .data(data)
-          .enter()
-          .append('circle')
-            .attr('cx', d => xScale(xValue(d)))
-            .attr('cy', d => yScale(yValue(d)))
-            .attr('r',  d => xValue(d)/2000)
-            .attr('fill','steelblue')
-          .on("mouseover", function(d,i) {
-            d3.select(this)
-              .attr('fill','maroon');
-            tooltip.style('opacity', 1)
-              .style('left',(d.pageX)+'px')
-              .style('top',(d.pageY)+'px')
-              .html("<p><span class='toolTip'>" + "COD: " + yValue(i) + "</span><br>" + "Deaths: " +numberFormat(xValue(i)) + "</p>")
-          })
-          .on('mousemove', function(d) {
-            tooltip
-              .style('top',(d3.pageX-5)+'px')
-              .style('left',(d3.pageY+10)+'px');
-          })
-          .on('mouseout', function() { 
-            d3.select(this)
-              .transition()
-              .duration(250)
-              .attr('fill','steelblue');
-            tooltip.style('opacity', 0) 
-          })
-
-  // Draw annotation
-  var theAnnotations = [1,2];
-
-  var annotations = svg.selectAll('.annotations')
-    .data(theAnnotations)
-    .enter().append('g')
-    .attr('class','myAnnotation')
-    .attr('transform',function(d, i) { return 'translate(50,' + i * 30 + ')'; });
-
-  annotations.append('text')
-    .attr('x', 100)
-    .attr('y', 50)
-    .transition()
-    .delay(1000)
-    .text(function(d, i) { 
+// dropdown menu
+const COD = ["Vascular dementia","Unspecified dementia","Organic amnesic syndrome, not induced by alcohol and other psychoactive substances","Delirium, not induced by alcohol and other psychoactive substances","Other mental disorders due to brain damage and dysfunction and to physical disease","Personality and behavioural disorders due to brain disease, damage and dysfunction","Unspecified organic or symptomatic mental disorder","Mental and behavioural disorders due to use of alcohol","Mental and behavioural disorders due to use of opioids","Mental and behavioural disorders due to use of cannabinoids","Mental and behavioural disorders due to use of sedatives or hypnotics","Mental and behavioural disorders due to use of cocaine","Mental and behavioural disorders due to use of other stimulants, including caffeine","Mental and behavioural disorders due to use of tobacco","Mental and behavioural disorders due to use of volatile solvents","Mental and behavioural disorders due to multiple drug use and use of other psychoactive substances","Schizophrenia","Schizotypal disorder","Persistent delusional disorders","Acute and transient psychotic disorders","Schizoaffective disorders","Unspecified nonorganic psychosis","Manic episode","Bipolar affective disorder","Depressive episodes","Recurrent depressive disorder","Persistent mood [affective] disorders","Other mood [affective] disorders","Unspecified mood [affective] disorder","Phobic anxiety disorders","Other anxiety disorders","Obsessive-compulsive disorder","Reaction to severe stress, and adjustment disorders","Dissociative [conversion] disorders","Somatoform disorders","Other neurotic disorders","Eating disorders","Psychological and behavioural factors associated with disorders or diseases classified elsewhere","Abuse of non-dependence-producing substances","Specific personality disorders","Other disorders of adult personality and behaviour","Unspecified disorder of adult personality and behaviour","Mild mental retardation","Moderate mental retardation","Severe mental retardation","Profound mental retardation","Unspecified mental retardation","Specific developmental disorder of motor function","Mixed specific developmental disorders","Pervasive developmental disorders","Unspecified disorder of psychological development","Conduct disorders","Unspecified mental disorder"];
+const dropdownMenu = (selection, props) => {
+  const {
+    options,
+    onOptionClicked,
+    selectedOption
+  } = props;
+  
+  let select = selection.selectAll('select').data([null]);
+  select = select.enter().append('select')
+    .merge(select)
+      .on('change', function() {
+        onOptionClicked(this.value);
+      });
+  
+  const option = select.selectAll('option').data(options);
+  option.enter().append('option')
+    .merge(option)
+      .attr('value', d => d)
+      .property('selected', d => d === selectedOption)
+      .text(function(d, i) { 
       switch (i) {
-        case 0: return ('- the highest deaths occured in seniors over 70 years old')
-        case 1: return ('- young people tend to be more resistant and to be able survive')
+        case 1: return('Vascular dementia')
+        case 2: return('Unspecified dementia')
+        case 3: return('Organic amnesic syndrome, not induced by alcohol and other psychoactive substances')
+        case 4: return('Delirium, not induced by alcohol and other psychoactive substances')
+        case 5: return('Other mental disorders due to brain damage and dysfunction and to physical disease')
+        case 6: return('Personality and behavioural disorders due to brain disease, damage and dysfunction')
+        case 7: return('Unspecified organic or symptomatic mental disorder')
+        case 8: return('Mental and behavioural disorders due to use of alcohol')
+        case 9: return('Mental and behavioural disorders due to use of opioids')
+        case 10: return('Mental and behavioural disorders due to use of cannabinoids')
+        case 11: return('Mental and behavioural disorders due to use of sedatives or hypnotics')
+        case 12: return('Mental and behavioural disorders due to use of cocaine')
+        case 13: return('Mental and behavioural disorders due to use of other stimulants, including caffeine')
+        case 14: return('Mental and behavioural disorders due to use of tobacco')
+        case 15: return('Mental and behavioural disorders due to use of volatile solvents')
+        case 16: return('Mental and behavioural disorders due to multiple drug use and use of other psychoactive substances')
+        case 17: return('Schizophrenia')
+        case 18: return('Schizotypal disorder')
+        case 19: return('Persistent delusional disorders')
+        case 20: return('Acute and transient psychotic disorders')
+        case 21: return('Schizoaffective disorders')
+        case 22: return('Unspecified nonorganic psychosis')
+        case 23: return('Manic episode')
+        case 24: return('Bipolar affective disorder')
+        case 25: return('Depressive episodes')
+        case 26: return('Recurrent depressive disorder')
+        case 27: return('Persistent mood [affective] disorders')
+        case 28: return('Other mood [affective] disorders')
+        case 29: return('Unspecified mood [affective] disorder')
+        case 30: return('Phobic anxiety disorders')
+        case 31: return('Other anxiety disorders')
+        case 32: return('Obsessive-compulsive disorder')
+        case 33: return('Reaction to severe stress, and adjustment disorders')
+        case 34: return('Dissociative [conversion] disorders')
+        case 35: return('Somatoform disorders')
+        case 36: return('Other neurotic disorders')
+        case 37: return('Eating disorders')
+        case 38: return('Psychological and behavioural factors associated with disorders or diseases classified elsewhere')
+        case 39: return('Abuse of non-dependence-producing substances')
+        case 40: return('Specific personality disorders')
+        case 41: return('Other disorders of adult personality and behaviour')
+        case 42: return('Unspecified disorder of adult personality and behaviour')
+        case 43: return('Mild mental retardation')
+        case 44: return('Moderate mental retardation')
+        case 45: return('Severe mental retardation')
+        case 46: return('Profound mental retardation')
+        case 47: return('Unspecified mental retardation')
+        case 48: return('Specific developmental disorder of motor function')
+        case 49: return('Mixed specific developmental disorders')
+        case 50: return('Pervasive developmental disorders')
+        case 51: return('Unspecified disorder of psychological development')
+        case 52: return('Conduct disorders')
+        case 53: return('Unspecified mental disorder')
       }
     });
-          
-    } 
+};
 
-    d3.csv('scene03_data.csv').then(data => {
-        data.forEach(d=> {
-            d.Total=+d.Total;
-        });
-        render(data);
+
+
+// line chart
+
+const scatterPlot = (selection, props) => {
+  const {
+    xValue,
+    xAxisLabel,
+    yValue,
+    circleRadius,
+    yAxisLabel,
+    margin,
+    width,
+    height,
+    data
+  } = props;
+  
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+  
+  const xScale = d3.scaleLinear()
+    .domain(d3.extent(data, xValue))
+    .range([0, innerWidth])
+    .nice();
+  
+  const yScale = d3.scaleLinear();
+  yScale.domain(d3.extent(data, yValue));
+  yScale.range([innerHeight, 0]);
+  yScale.nice();
+  
+  const g = selection.selectAll('.container').data([null]);
+  const gEnter = g
+    .enter().append('g')
+      .attr('class', 'container');
+  gEnter
+    .merge(g)
+      .attr('transform',
+        `translate(${margin.left},${margin.top})`
+      );
+  
+  const xAxis = d3.axisBottom(xScale)
+    .tickSize(-innerHeight)
+    .tickPadding(15);
+  
+  const yAxis = d3.axisLeft(yScale)
+    .tickSize(-innerWidth)
+    .tickPadding(10);
+  
+  const yAxisG = g.select('.y-axis');
+  const yAxisGEnter = gEnter
+    .append('g')
+      .attr('class', 'y-axis');
+  yAxisG
+    .merge(yAxisGEnter)
+      .call(yAxis)
+      .selectAll('.domain').remove();
+  
+  const yAxisLabelText = yAxisGEnter
+    .append('text')
+      .attr('class', 'axis-label')
+      .attr('y', -93)
+      .attr('fill', 'black')
+      .attr('transform', `rotate(-90)`)
+      .attr('text-anchor', 'middle')
+    .merge(yAxisG.select('.axis-label'))
+      .attr('x', -innerHeight / 2)
+      .text(yAxisLabel);
+  
+  
+  const xAxisG = g.select('.x-axis');
+  const xAxisGEnter = gEnter
+    .append('g')
+      .attr('class', 'x-axis');
+  xAxisG
+    .merge(xAxisGEnter)
+      .attr('transform', `translate(0,${innerHeight})`)
+      .call(xAxis)
+      .selectAll('.domain').remove();
+  
+  const xAxisLabelText = xAxisGEnter
+    .append('text')
+      .attr('class', 'axis-label')
+      .attr('y', 75)
+      .attr('fill', 'black')
+    .merge(xAxisG.select('.axis-label'))
+      .attr('x', innerWidth / 2)
+      .text(xAxisLabel);
+
+  
+  const circles = g.merge(gEnter)
+    .selectAll('circle').data(data);
+  circles
+    .enter().append('circle')
+      .attr('cx', innerWidth / 2)
+      .attr('cy', innerHeight / 2)
+      .attr('r', 0)
+    .merge(circles)
+    .transition().duration(2000)
+    .delay((d, i) => i * 10)
+      .attr('cy', d => yScale(yValue(d)))
+      .attr('cx', d => xScale(xValue(d)))
+      .attr('r', circleRadius);
+};
+
+
+// main body
+
+const svg = d3.select('svg');
+
+const width = +svg.attr('width');
+const height = +svg.attr('height');
+
+let data;
+let xColumn;
+let yColumn;
+
+const onXColumnClicked = column => {
+  xColumn = column;
+  render();
+};
+
+const onYColumnClicked = column => {
+  yColumn = column;
+  render();
+};
+
+const render = () => {
+  
+  d3.select('#x-menu')
+    .call(dropdownMenu, {
+      options: data.columns,
+      onOptionClicked: onXColumnClicked,
+      selectedOption: xColumn
     });
+  
+  d3.select('#y-menu')
+    .call(dropdownMenu, {
+      options: data.columns,
+      onOptionClicked: onYColumnClicked,
+      selectedOption: yColumn
+    });
+  
+  svg.call(scatterPlot, {
+    xValue: d => d[xColumn],
+    xAxisLabel: xColumn,
+    yValue: d => d[yColumn],
+    circleRadius: 10,
+    yAxisLabel: yColumn,
+    margin: { top: 10, right: 40, bottom: 88, left: 150 },
+    width,
+    height,
+    data
+  });
+};
+
+d3.csv('scene03b_data.csv')
+  .then(loadedData => {
+    data = loadedData;
+    data.forEach(d => {
+      d.COD_F01 = +d.COD_F01;
+      d.COD_F03 = +d.COD_F03;
+      d.COD_F04 = +d.COD_F04;
+      d.COD_F05 = +d.COD_F05;
+      d.COD_F06 = +d.COD_F06;
+      d.COD_F07 = +d.COD_F07;
+      d.COD_F09 = +d.COD_F09;
+      d.COD_F10 = +d.COD_F10;
+      d.COD_F11 = +d.COD_F11;
+      d.COD_F12 = +d.COD_F12;
+      d.COD_F13 = +d.COD_F13;
+      d.COD_F14 = +d.COD_F14;
+      d.COD_F15 = +d.COD_F15;
+      d.COD_F17 = +d.COD_F17;
+      d.COD_F18 = +d.COD_F18;
+      d.COD_F19 = +d.COD_F19;
+      d.COD_F20 = +d.COD_F20;
+      d.COD_F21 = +d.COD_F21;
+      d.COD_F22 = +d.COD_F22;
+      d.COD_F23 = +d.COD_F23;
+      d.COD_F25 = +d.COD_F25;
+      d.COD_F29 = +d.COD_F29;
+      d.COD_F30 = +d.COD_F30;
+      d.COD_F31 = +d.COD_F31;
+      d.COD_F32 = +d.COD_F32;
+      d.COD_F33 = +d.COD_F33;
+      d.COD_F34 = +d.COD_F34;
+      d.COD_F38 = +d.COD_F38;
+      d.COD_F39 = +d.COD_F39;
+      d.COD_F40 = +d.COD_F40;
+      d.COD_F41 = +d.COD_F41;
+      d.COD_F42 = +d.COD_F42;
+      d.COD_F43 = +d.COD_F43;
+      d.COD_F44 = +d.COD_F44;
+      d.COD_F45 = +d.COD_F45;
+      d.COD_F48 = +d.COD_F48;
+      d.COD_F50 = +d.COD_F50;
+      d.COD_F54 = +d.COD_F54;
+      d.COD_F55 = +d.COD_F55;
+      d.COD_F60 = +d.COD_F60;
+      d.COD_F68 = +d.COD_F68;
+      d.COD_F69 = +d.COD_F69;
+      d.COD_F70 = +d.COD_F70;
+      d.COD_F71 = +d.COD_F71;
+      d.COD_F72 = +d.COD_F72;
+      d.COD_F73 = +d.COD_F73;
+      d.COD_F79 = +d.COD_F79;
+      d.COD_F82 = +d.COD_F82;
+      d.COD_F83 = +d.COD_F83;
+      d.COD_F84 = +d.COD_F84;
+      d.COD_F89 = +d.COD_F89;
+      d.COD_F91 = +d.COD_F91;
+      d.COD_F99 = +d.COD_F99;
+    });
+//    data.columnns[1] = "Vascular dementia";
+//    data.columns.text = COD;
+    xColumn = data.columns[1];
+    yColumn = data.columns[17];
+    render();
+  });
+
+//  console.log(d.columns.text);
 
 </script>
 </body>
