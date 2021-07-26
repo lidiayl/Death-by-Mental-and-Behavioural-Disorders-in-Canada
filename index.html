@@ -8,20 +8,16 @@
 <script src='https://d3js.org/d3.v6.min.js'></script>
 
 <body>
-  <h1>Death by Mental and Behavioural Disorders in Canada</h1>
+  <h1>Death by Mental and Behavioural Disorders in Canada between 2000 to 2019</h1>
   <br>
   <a href="scene02.html"><img src="next.png" alt="next" style="width:50px;height:25px;"></a>
   <br>
-<svg width='960' height='500'></svg>
+<svg width="900" height="500"></svg>
 <div id="tooltip"></div>
 <div id="myAnnotation"></div>
+
 <script>
-    const svg = d3.select('svg');
-    const width = 960;
-    const height = 500;
-
-    const numberFormat = d3.format(',.0f');
-
+    const numberFormat = d3.format(",.0f");
     var tooltip = d3.select('#tooltip');
     var myAnnotation = d3.select('#myAnnotation')
           .transition()
@@ -30,96 +26,89 @@
     const render = data => {
         const xValue = d => d.Year;
         const yValue = d => d.Total;
-        const margin = {top:50, right:50, bottom:50, left:100};
-        const innerWidth = width - margin.left - margin.right;
-        const innerHeight = height - margin.top - margin.bottom;
-
-        const xScale = d3.scaleBand()
+    
+        var x = d3.scaleBand()
             .domain(data.map(xValue))
-            .range([0,innerWidth])
-            .padding(0,3);
-        
-        const yScale = d3.scaleLinear()
+            .range ([0,800])
+        var y = d3.scaleLinear()
             .domain([d3.max(data,yValue),0])
-            .range([0,innerHeight]);
+            .range([0,400]);
 
-        const g = svg.append('g')
-          .attr('transform',`translate(${margin.left},${margin.top})`);
+        d3.select("svg")
+            .attr("width",900)
+            .attr("height",500)
+            .append("g")
+                .attr("transform","translate(50,50)")
+            .selectAll("rect").data(data).enter().append("rect")
+                .attr("x",d => x(xValue(d)))
+                .attr("y", d => y(yValue(d)))
+                .attr("width", 30)
+                .attr("height", d => 400-y(yValue(d)))
+                .attr("fill","steelblue")
+            .on("mouseover", function(d,i) {
+                d3.select(this)
+                    .attr("fill","turquoise");
+                tooltip.style("opacity",1)
+                    .style("left",(d.pageX)+"px")
+                    .style("top",(d.pageY)+"px")
+                    .html("<p><span class='toolTip'>" + "Year: " + xValue(i) + "</span><br>" + "Deaths: " +numberFormat(yValue(i)) + "</p>")
+            })
+            .on("mousemove",function(d) {
+                tooltip
+                    .style("top",(d3.pageX-5)+"px")
+                    .style("left",(d3.pageY+10)+"px")
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .transition()
+                    .duration(250)
+                    .attr("fill","steelblue");
+                tooltip.style("opacity",0)
+            });
+    
 
-        const xAxis = g.append('g')
-          .call(d3.axisBottom(xScale))
-          .attr('transform',`translate(0,${innerHeight})`)
-          g.append('text')
-            .attr('x', innerWidth/2)
-            .attr('y',450)
-            .attr('fill', 'darkblue')
-            .attr('font-family','sans-serif')
-            .text('Year');
+            
+        
+        // Draw annotation
+        var theAnnotations = [1,2];
 
-        const yAxisTickFormat = number => 
-          format('.2s')(number);
+        var annotations = d3.select("svg").selectAll('.annotations')
+            .data(theAnnotations)
+            .enter().append('g')
+            .attr('class','myAnnotation')
+            .attr('transform',function(d, i) { return 'translate(50,' + i * 30 + ')'; });
 
-        const yAxis = g.append('g')
-            .call(d3.axisLeft(yScale))
-            g.append('text')
-              .attr('x',-50)
-              .attr('y', -20)
-              .attr('fill','darkblue')
-              .attr('font-family','sans-serif')
-              .text('Deaths')
+        annotations.append('text')
+            .attr('x', 50)
+            .attr('y', 50)
+            .transition()
+            .delay(1500)
+            .text(function(d, i) { 
+                switch (i) {
+                    case 0: return ('- over 200,000 people in Canada died every year due to mental and behaviour disorder')
+                    case 1: return ('- the average increase rate is 1.41% per year')
+                }
+            });
 
-        g.selectAll('rect')
-          .data(data)
-          .enter()
-          .append('rect')
-            .attr('x', d => xScale(xValue(d)))
-            .attr('y', d => yScale(yValue(d)))
-            .attr('width', 30)
-            .attr('height',d => innerHeight - yScale(yValue(d)))
-            .attr('fill','steelblue')
-          .on("mouseover", function(d,i) {
-            d3.select(this)
-              .attr('fill','maroon');
-            tooltip.style('opacity', 1)
-              .style('left',(d.pageX)+'px')
-              .style('top',(d.pageY)+'px')
-              .html("<p><span class='toolTip'>" + "Year: " + xValue(i) + "</span><br>" + "Deaths: " +numberFormat(yValue(i)) + "</p>")
-          })
-          .on('mousemove', function(d) {
-            tooltip
-              .style('top',(d3.pageX-5)+'px')
-              .style('left',(d3.pageY+10)+'px');
-          })
-          .on('mouseout', function() { 
-            d3.select(this)
-              .transition()
-              .duration(250)
-              .attr('fill','steelblue');
-            tooltip.style('opacity', 0) 
-          })
-
-  // Draw annotation
-  var theAnnotations = [1,2];
-
-  var annotations = svg.selectAll('.annotations')
-    .data(theAnnotations)
-    .enter().append('g')
-    .attr('class','myAnnotation')
-    .attr('transform',function(d, i) { return 'translate(50,' + i * 30 + ')'; });
-
-  annotations.append('text')
-    .attr('x', 100)
-    .attr('y', 50)
-    .transition()
-    .delay(1000)
-    .text(function(d, i) { 
-      switch (i) {
-        case 0: return ('- over 200,000 people in Canada died every year due to mental and behaviour disorder')
-        case 1: return ('- the average increase rate is 1.41% per year')
-      }
-    });
-          
-    } 
+        
+        d3.select("svg").append("g")
+            .attr("transform","translate(50,50)")
+            .call(d3.axisLeft(y));
+            
+    
+        d3.select("svg").append("g")
+            .attr("transform","translate(50,450)")
+            .call(d3.axisBottom(x));
+        d3.select("svg").append("g").append("text")
+            .attr("y", 495)
+            .attr("x", 450)
+            .attr("fill","steelblue")
+            .attr("font-family","sans-serif")
+            .attr("font-weight","bold")
+            .attr("text-anchor","center")
+            .attr("font-size","large")
+            .text("Year");
+    }
 
     d3.csv('scene01_data.csv').then(data => {
         data.forEach(d=> {
@@ -128,6 +117,19 @@
         render(data);
     });
 
+    
+
 </script>
+
+<br>
+<p>According to the World Health Organization (WHO), mental and behavioural disorders are understood as clinically significant conditions characterized by alterations in thinking, mood (emotions) or behaviour
+    associated with personal distress and/or impaired functioning. Many deaths are either directly or indirectly caused by the mental and behavioural disorders.</p>
+
+<p>This is a serious issue as the Centre for Addiction and Mental Health Canada noted that in any given year, 1 in 5 Canadians experiences a mental illness or addiction problem. People with mental illness and addictions are more likely to die prematurely than the general population.</p>
+
+<p>This narrative visualization intends to present the results of the data analysis made on the data extracted from <span><a href="https://www150.statcan.gc.ca/n1/en/type/data" target="_blank">Statistics Canada</a></span> using the data between 2000 to 2019.</p>
+
+<p style = "color: rgb(21, 98, 161); font-style: italic;">Put your cursor on any of the bar to see the exact numbers of death per year or click 'next' to explore more.</p>
+
 </body>
 </html>
