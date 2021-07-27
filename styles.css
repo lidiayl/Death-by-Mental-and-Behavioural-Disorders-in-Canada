@@ -50,6 +50,9 @@ a {
 }
 
 p {
-  width: 60em;
   font-family: 'roboto', sans-serif;
+}
+
+.articles {
+  width: 60em;
 }
