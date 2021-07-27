@@ -10,7 +10,7 @@
 <body>
   <h1>Death by Mental and Behavioural Disorders in Canada by Age Group</h1>
   <br>
-  <a href="https://lidiayl.github.io/Death-by-Mental-and-Behavioural-Disorders-in-Canada/"><img src="back.png" alt="back" style="width:50px;height:25px;"></a>
+  <a href="index.html"><img src="back.png" alt="back" style="width:50px;height:25px;"></a>
   <a href="scene03.html"><img src="next.png" alt="next" style="width:50px;height:25px;"></a>
   <br>
 <svg width="900" height="500"></svg>
@@ -69,19 +69,30 @@
     
         
         // Draw annotation
-        var theAnnotations = [1,2,3];
+        var theAnnotations = [1,2,3,4];
 
         var annotations = d3.select("svg").selectAll('.annotations')
             .data(theAnnotations)
             .enter().append('g')
+            .style('opacity',1)
             .attr('class','myAnnotation')
             .attr('transform',function(d, i) { return 'translate(50,' + i * 30 + ')'; });
+
+        annotations.append('rect')
+            .attr('x',40)
+            .attr('y',15)
+            .attr('height',30)
+            .transition()
+            .delay(2000)
+            .attr('width',390)
+            .attr('fill','lightblue')
+            .style('opacity',0.3);    
 
         annotations.append('text')
             .attr('x', 50)
             .attr('y', 50)
             .transition()
-            .delay(1500)
+            .delay(2000)
             .text(function(d, i) { 
                 switch (i) {
                     case 0: return ('- the highest deaths occured in seniors over 70 years old')

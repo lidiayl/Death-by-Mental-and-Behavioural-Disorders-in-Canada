@@ -14,14 +14,10 @@
   <br>
 <svg width="900" height="500"></svg>
 <div id="tooltip"></div>
-<div id="myAnnotation"></div>
 
 <script>
     const numberFormat = d3.format(",.0f");
     var tooltip = d3.select('#tooltip');
-    var myAnnotation = d3.select('#myAnnotation')
-          .transition()
-          .delay(100);
 
     const render = data => {
         const xValue = d => d.Year;
@@ -70,19 +66,30 @@
             
         
         // Draw annotation
-        var theAnnotations = [1,2];
+        var theAnnotations = [1,2,3];
 
-        var annotations = d3.select("svg").selectAll('.annotations')
+        var annotations = d3.select("svg").selectAll('.myAnnotation')
             .data(theAnnotations)
             .enter().append('g')
+            .style('opacity',1)
             .attr('class','myAnnotation')
             .attr('transform',function(d, i) { return 'translate(50,' + i * 30 + ')'; });
+        
+        annotations.append('rect')
+            .attr('x',40)
+            .attr('y',15)
+            .attr('height',30)
+            .transition()
+            .delay(2000)
+            .attr('width',530)
+            .attr('fill','lightblue')
+            .style('opacity',0.3);    
 
         annotations.append('text')
             .attr('x', 50)
             .attr('y', 50)
             .transition()
-            .delay(1500)
+            .delay(2000)
             .text(function(d, i) { 
                 switch (i) {
                     case 0: return ('- over 200,000 people in Canada died every year due to mental and behaviour disorder')
@@ -90,6 +97,7 @@
                 }
             });
 
+            
         
         d3.select("svg").append("g")
             .attr("transform","translate(50,50)")
