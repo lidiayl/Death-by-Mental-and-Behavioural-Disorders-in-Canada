@@ -1,5 +1,6 @@
 html {
-  margin: 2rem;
+  margin-top: 2rem;
+  margin-left: 2rem;
 }
 
 h1 {
@@ -49,5 +50,6 @@ a {
 }
 
 p {
+  width: 60em;
   font-family: 'roboto', sans-serif;
 }
